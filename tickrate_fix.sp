@@ -29,7 +29,7 @@
 #define MAX_EDICTS         2048 //(1 << 11)
 #define ENTITY_MAX_NAME    64
 #define CVAR_FLAGS         FCVAR_NOTIFY
-#define PLUGIN_VERSION     "1.3.2"
+#define PLUGIN_VERSION     "1.3.3"
 
 enum /*DoorsTypeTracked*/
 {
@@ -108,7 +108,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	CreateConVar("l4d_tickrate_fixes_version", PLUGIN_VERSION, "Tickrate Fixes plugin version.", FCVAR_NOTIFY|FCVAR_DONTRECORD);
-	g_hPistolDelayDualies = CreateConVar("l4d_tickrate_pistol_dualies", "0.1", "Minimum time (in seconds) between dual pistol shots", CVAR_FLAGS, true, 0.0, true, 5.0);
+	g_hPistolDelayDualies = CreateConVar("l4d_tickrate_pistol_dualies", "0.15", "Minimum time (in seconds) between dual pistol shots", CVAR_FLAGS, true, 0.0, true, 5.0);
 	g_hPistolDelaySingle = CreateConVar("l4d_tickrate_pistol_single", "0.2", "Minimum time (in seconds) between single pistol shots", CVAR_FLAGS, true, 0.0, true, 5.0);
 	g_hPistolDelayIncapped = CreateConVar("l4d_tickrate_pistol_incapped", "0.3", "Minimum time (in seconds) between pistol shots while incapped", CVAR_FLAGS, true, 0.0, true, 5.0);
 	g_hCvarDoorSpeed = CreateConVar("l4d_tickrate_door_speed", "2.0", "Sets the speed of all prop_door entities on a map. 1.05 means = 105% speed", CVAR_FLAGS, true, 0.0, true, 5.0);
@@ -235,7 +235,7 @@ void UpdatePistolDelays()
 
 public void Hook_OnPreThink(int iClient)
 {
-	if ( !IsClientInGame(iClient) ) 
+	if ( !IsClientInGame(iClient) || GetClientTeam(iClient) != 2 ) 
 	{
 		return;
 	}
@@ -263,7 +263,7 @@ public void Hook_OnPreThink(int iClient)
 public void Event_WeaponFire(Event event, const char[] name , bool dontBroadcast)
 {
 	int iClient = GetClientOfUserId(event.GetInt("userid"));
-	if ( iClient < 1 ) 
+	if ( !IsClientInGame(iClient) || GetClientTeam(iClient) != 2 ) 
 	{
 		return;
 	}
